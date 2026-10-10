@@ -1,30 +1,23 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:caries_scan_app/main.dart';
+import 'package:caries_scan_app/presentation/pages/welcome.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:caries_scan_app/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('App renders splash and welcome screen properly', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MyApp());
+    // Verify initial render
+    expect(find.byType(MyApp), findsOneWidget);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Pump timer for splash
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify Welcome screen is presented
+    expect(find.byType(WelcomePage), findsOneWidget);
+    expect(find.text('Welcome'), findsOneWidget);
+    expect(find.text('Sign Up'), findsOneWidget);
+    expect(find.text('I already have an account'), findsOneWidget);
   });
 }

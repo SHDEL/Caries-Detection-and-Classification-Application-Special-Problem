@@ -1,0 +1,17 @@
+import 'package:caries_scan_app/presentation/theme/app_colors.dart';
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  static final lightTheme = ThemeData(
+    primaryColor: AppColors.primary,
+    scaffoldBackgroundColor: Colors.white,
+    fontFamily: 'Nunito',
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+      ),
+    ),
+  );
+}

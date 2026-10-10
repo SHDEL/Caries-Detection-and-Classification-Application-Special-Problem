@@ -32,6 +32,13 @@ func main() {
 				"message": "Dental Screening API is running!",
 			})
 		})
+
+		api.GET("/remote-control", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"status":  "success",
+				"message": "Remote Control Test Success",
+			})
+		})
 	}
 
 	// รันเซิร์ฟเวอร์ที่ localhost:8080
