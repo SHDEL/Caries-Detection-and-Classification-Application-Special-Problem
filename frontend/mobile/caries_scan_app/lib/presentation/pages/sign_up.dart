@@ -2,6 +2,9 @@ import 'package:caries_scan_app/presentation/pages/sign_in.dart';
 import 'package:caries_scan_app/presentation/theme/app_colors.dart';
 import 'package:caries_scan_app/presentation/widgets/primary_app_button.dart';
 import 'package:caries_scan_app/presentation/widgets/primary_input.dart';
+import 'package:caries_scan_app/services/api_service.dart';
+import 'package:caries_scan_app/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -16,6 +19,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -25,8 +29,48 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  void _handleSignUp() {
-    // โค้ดสำหรับจัดการสมัครสมาชิก
+  Future<void> _handleSignUp() async {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('กรุณากรอกอีเมลและรหัสผ่าน')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // เรียกใช้ AuthService เพียงบรรทัดเดียว (ทั้ง Firebase + Backend Sync เสร็จในตัว)
+      await AuthService.signUpWithEmail(
+        email: email,
+        password: password,
+        username: username,
+      );
+
+      if (mounted) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'การสมัครสมาชิกล้มเหลว')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('เกิดข้อผิดพลาด: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   void _handleGoogleSignUp() {
@@ -53,10 +97,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               const SizedBox(height: 36),
-              PrimaryInput(
-                text: 'Username',
-                controller: _usernameController,
-              ),
+              PrimaryInput(text: 'Username', controller: _usernameController),
               const SizedBox(height: 20),
               PrimaryInput(
                 text: 'Email',
@@ -72,10 +113,16 @@ class _SignUpPageState extends State<SignUpPage> {
               const SizedBox(height: 36),
               SizedBox(
                 width: double.infinity,
-                child: PrimaryAppButton(
-                  text: 'Create an Account',
-                  onPressed: _handleSignUp,
-                ),
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : PrimaryAppButton(
+                        text: 'Create an Account',
+                        onPressed: _handleSignUp,
+                      ),
               ),
               const SizedBox(height: 24),
               const Text(

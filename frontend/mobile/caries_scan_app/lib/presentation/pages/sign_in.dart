@@ -2,6 +2,8 @@ import 'package:caries_scan_app/presentation/pages/sign_up.dart';
 import 'package:caries_scan_app/presentation/theme/app_colors.dart';
 import 'package:caries_scan_app/presentation/widgets/primary_app_button.dart';
 import 'package:caries_scan_app/presentation/widgets/primary_input.dart';
+import 'package:caries_scan_app/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -15,6 +17,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -23,8 +26,42 @@ class _SignInPageState extends State<SignInPage> {
     super.dispose();
   }
 
-  void _handleSignIn() {
-    // โค้ดสำหรับจัดการเข้าสู่ระบบ
+  Future<void> _handleSignIn() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('กรุณากรอกอีเมลและรหัสผ่าน')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await AuthService.signInWithEmail(email: email, password: password);
+
+      if (mounted) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'การเข้าสู่ระบบล้มเหลว')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('เกิดข้อผิดพลาด: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   void _handleGoogleSignIn() {
@@ -65,10 +102,16 @@ class _SignInPageState extends State<SignInPage> {
               const SizedBox(height: 36),
               SizedBox(
                 width: double.infinity,
-                child: PrimaryAppButton(
-                  text: 'Sign In',
-                  onPressed: _handleSignIn,
-                ),
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : PrimaryAppButton(
+                        text: 'Sign In',
+                        onPressed: _handleSignIn,
+                      ),
               ),
               const SizedBox(height: 24),
               const Text(

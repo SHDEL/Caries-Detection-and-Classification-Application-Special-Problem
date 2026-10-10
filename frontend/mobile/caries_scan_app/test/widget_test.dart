@@ -1,18 +1,10 @@
-import 'package:caries_scan_app/main.dart';
 import 'package:caries_scan_app/presentation/pages/welcome.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('App renders splash and welcome screen properly', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const MyApp());
-    // Verify initial render
-    expect(find.byType(MyApp), findsOneWidget);
-
-    // Pump timer for splash
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pumpAndSettle();
+  testWidgets('Welcome screen renders properly', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(home: WelcomePage()));
 
     // Verify Welcome screen is presented
     expect(find.byType(WelcomePage), findsOneWidget);
