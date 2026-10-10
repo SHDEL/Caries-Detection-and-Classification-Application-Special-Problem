@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dental-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      TZ: Asia/Bangkok
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dental-network
+
+  adminer:
+    image: adminer:latest
+    container_name: dental-adminer
+    restart: always
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: win98
+    ports:
+      - "8000:8080"
+    depends_on:
+      - postgres
+    networks:
+      - dental-network
+
+volumes:
+  postgres_data:
+
+networks:
+  dental-network:
+    driver: bridge
