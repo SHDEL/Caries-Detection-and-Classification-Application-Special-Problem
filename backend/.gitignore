@@ -1,4 +1,5 @@
 # 1. ไฟล์ความลับและความปลอดภัย (ห้ามขึ้น Git เด็ดขาด)
+firebaseServiceAccountKey.json
 *.pem
 *.key
 .env
