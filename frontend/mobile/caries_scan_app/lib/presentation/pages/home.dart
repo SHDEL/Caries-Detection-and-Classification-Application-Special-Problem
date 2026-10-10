@@ -1,72 +1,81 @@
-import 'package:caries_scan_app/presentation/theme/app_colors.dart';
-import 'package:caries_scan_app/presentation/widgets/outline_app_button.dart';
-import 'package:caries_scan_app/services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:caries_scan_app/presentation/pages/account_page.dart';
+import 'package:caries_scan_app/presentation/pages/history_page.dart';
+import 'package:caries_scan_app/presentation/pages/home_dashboard_page.dart';
+import 'package:caries_scan_app/presentation/pages/record_detail_page.dart';
+import 'package:caries_scan_app/presentation/pages/scan_guide_page.dart';
+import 'package:caries_scan_app/presentation/widgets/app_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+/// [HomePage] หน้าหลักของแอปพลิเคชันที่รวมแท็บเมนูต่าง ๆ ตามดีไซน์
+/// - Tab 0: HomeDashboardPage (รูปที่ 1)
+/// - Tab 1: ScanGuidePage (รูปที่ 2)
+/// - Tab 2: HistoryPage (รูปที่ 3) และ RecordDetailPage (รูปที่ 4 & 5)
+/// - Tab 3: ProfilePage
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+  int? _selectedRecordId;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Caries Scan',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: AppColors.primary),
-            tooltip: 'ออกจากระบบ',
-            onPressed: () => AuthService.signOut(),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.check_circle_outline,
-                size: 80,
-                color: AppColors.primary,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'เข้าสู่ระบบสำเร็จ',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                user?.email ?? user?.displayName ?? 'User',
-                style: const TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-              const SizedBox(height: 48),
-              SizedBox(
-                width: double.infinity,
-                child: OutlineAppButton(
-                  text: 'ออกจากระบบ',
-                  onPressed: () => AuthService.signOut(),
-                ),
-              ),
-            ],
-          ),
-        ),
+      body: _buildCurrentPage(),
+      bottomNavigationBar: AppBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+            _selectedRecordId = null; // รีเซ็ตการดูหน้ารายละเอียดเมื่อสลับแท็บ
+          });
+        },
       ),
     );
+  }
+
+  Widget _buildCurrentPage() {
+    switch (_currentIndex) {
+      case 0:
+        return const HomeDashboardPage();
+      case 1:
+        return ScanGuidePage(
+          onScanPressed: () {
+            // สลับไปแท็บประวัติหรือแสดงหน้ารายละเอียดเพื่อพรีวิว
+            setState(() {
+              _currentIndex = 2;
+              _selectedRecordId = 3;
+            });
+          },
+        );
+      case 2:
+        if (_selectedRecordId != null) {
+          return RecordDetailPage(
+            recordTitle: 'ผลการตรวจครั้งที่ $_selectedRecordId',
+            onBack: () {
+              setState(() {
+                _selectedRecordId = null;
+              });
+            },
+          );
+        }
+        return HistoryPage(
+          onSelectRecord: (recordId) {
+            setState(() {
+              _selectedRecordId = recordId;
+            });
+          },
+        );
+      case 3:
+        return const AccountPage();
+      default:
+        return const HomeDashboardPage();
+    }
   }
 }
 

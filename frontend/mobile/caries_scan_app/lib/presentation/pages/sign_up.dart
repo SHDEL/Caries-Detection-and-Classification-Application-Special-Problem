@@ -2,7 +2,6 @@ import 'package:caries_scan_app/presentation/pages/sign_in.dart';
 import 'package:caries_scan_app/presentation/theme/app_colors.dart';
 import 'package:caries_scan_app/presentation/widgets/primary_app_button.dart';
 import 'package:caries_scan_app/presentation/widgets/primary_input.dart';
-import 'package:caries_scan_app/services/api_service.dart';
 import 'package:caries_scan_app/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
