@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "280381987466",
+    "project_id": "cariesscanapp",
+    "storage_bucket": "cariesscanapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280381987466:android:8b408044d79f7998e6ab73",
+        "android_client_info": {
+          "package_name": "com.example.caries_scan_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsmbRsfxH0quCPWjfWr9TV9trRnDUBJhA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

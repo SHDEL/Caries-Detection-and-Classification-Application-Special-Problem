@@ -37,6 +37,7 @@ dependencies:
   gradient_elevated_button: ^1.2.0
   flutter_svg: ^2.0.10
   flutter_launcher_icons: ^0.14.4
+  firebase_core: ^4.15.0
 
 dev_dependencies:
   flutter_test:
